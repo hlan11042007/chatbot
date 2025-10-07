@@ -37,7 +37,7 @@ st.markdown("""
 # 🧠 Banner minh hoạ vật lý
 st.image(
     "https://cdn.pixabay.com/photo/2015/09/09/18/53/physics-932365_1280.jpg",
-    use_column_width=True,
+    use_container_width=True,  # ✅ dùng tham số mới
     caption="Khám phá tri thức Vật Lý cùng AI 🇻🇳",
 )
 
