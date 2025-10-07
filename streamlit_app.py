@@ -62,14 +62,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# === BANNER ẢNH VẬT LÝ ===
-st.markdown(
-    """
-    <img src="hoanglan.jpg" width="700" class="banner">
-    """,
-    unsafe_allow_html=True
-)
-
 # === ẢNH AVATAR TÁC GIẢ ===
 author_image_path = "hoanglan.jpg"
 if os.path.exists(author_image_path):
