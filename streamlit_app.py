@@ -65,7 +65,7 @@ st.markdown("""
 # === BANNER ẢNH VẬT LÝ ===
 st.markdown(
     """
-    <img src="https://i.imgur.com/6jB5v8M.png" width="700" class="banner">
+    <img src="hoanglan.jpg" width="700" class="banner">
     """,
     unsafe_allow_html=True
 )
