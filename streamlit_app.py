@@ -40,7 +40,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # === TIÊU ĐỀ & MÔ TẢ ===
-st.title("⚡ Chatbot Vật Lý – Tuổi Trẻ Việt Nam ⚡")
+st.title("⚡ Chatbot Vật Lý ⚡")
 st.markdown('<p class="subtitle">Khám phá Vật Lý dễ hiểu cùng trí tuệ nhân tạo – học nhanh, hiểu sâu, sáng tạo không giới hạn! 🇻🇳</p>', unsafe_allow_html=True)
 st.markdown('<p class="author">Tác giả: <b>Hoàng Lân</b></p>', unsafe_allow_html=True)
 
