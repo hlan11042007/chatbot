@@ -27,8 +27,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # === TIÊU ĐỀ & GIỚI THIỆU ===
-st.title("⚡ Chatbot Vật Lý – Tuổi Trẻ Việt Nam ⚡")
-st.caption("Khám phá thế giới Vật Lý cùng trí tuệ nhân tạo – học hỏi, sáng tạo và phát triển! 🇻🇳")
+st.title("⚡ Chatbot Học Tập ⚡")
+st.caption("Khám phá thế giới Vật Lý cùng trí tuệ nhân tạo – học hỏi, sáng tạo và phát triển!")
 
 # === KẾT NỐI OPENAI ===
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
