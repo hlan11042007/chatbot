@@ -1,47 +1,67 @@
 import streamlit as st
 from openai import OpenAI
 
-# Tiêu đề & mô tả
-st.title("💬 Chatbot Học Tập")
-st.write(
-    "Đây là chatbot đơn giản dùng mô hình GPT của OpenAI để trò chuyện. "
-    "Bạn không cần nhập API key nếu chủ app đã cài sẵn trong `Secrets`. "
-    "Nếu muốn lấy key riêng, xem hướng dẫn [tại đây](https://platform.openai.com/account/api-keys)."
-)
+# === GIAO DIỆN ===
+st.set_page_config(page_title="Chatbot Vật Lý", page_icon="⚡", layout="centered")
 
-# 🔑 Lấy API key từ Secrets (đã cài trong Streamlit Cloud)
+# CSS tùy chỉnh (phong cách trẻ trung, năng động)
+st.markdown("""
+    <style>
+        body {
+            background: linear-gradient(135deg, #e0f7fa, #fffde7);
+            color: #222;
+        }
+        .stApp {
+            background: linear-gradient(135deg, #c8e6c9, #fff9c4);
+        }
+        h1 {
+            text-align: center;
+            color: #2e7d32;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .stChatInput input {
+            border-radius: 12px;
+            border: 1.5px solid #4caf50;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
+# === TIÊU ĐỀ & GIỚI THIỆU ===
+st.title("⚡ Chatbot Vật Lý – Tuổi Trẻ Việt Nam ⚡")
+st.caption("Khám phá thế giới Vật Lý cùng trí tuệ nhân tạo – học hỏi, sáng tạo và phát triển! 🇻🇳")
+
+# === KẾT NỐI OPENAI ===
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
-# Lưu lịch sử hội thoại
+# === LƯU LỊCH SỬ ===
 if "messages" not in st.session_state:
-    st.session_state.messages = []
+    st.session_state.messages = [
+        {"role": "system", "content": "Bạn là Chatbot vui vẻ, nói tiếng Việt, chuyên giúp học sinh Việt Nam hiểu Vật Lý dễ hơn. Hãy truyền cảm hứng học tập!"}
+    ]
 
-# Hiển thị tin nhắn cũ
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
+# === HIỂN THỊ TIN NHẮN CŨ ===
+for msg in st.session_state.messages[1:]:
+    avatar = "👩‍🎓" if msg["role"] == "user" else "⚡"
+    with st.chat_message(msg["role"], avatar=avatar):
+        st.markdown(msg["content"])
 
-# Ô nhập chat
-if prompt := st.chat_input("Nhập tin nhắn của bạn..."):
-
-    # Lưu & hiển thị tin nhắn người dùng
+# === NHẬP CÂU HỎI ===
+if prompt := st.chat_input("Nhập câu hỏi Vật Lý của bạn..."):
     st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user"):
+    with st.chat_message("user", avatar="👩‍🎓"):
         st.markdown(prompt)
 
-    # Gọi OpenAI để sinh phản hồi
-    stream = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {"role": m["role"], "content": m["content"]}
-            for m in st.session_state.messages
-        ],
-        stream=True,
-    )
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=st.session_state.messages,
+            stream=True,
+        )
 
-    # Ghi phản hồi ra giao diện
-    with st.chat_message("assistant"):
-        response = st.write_stream(stream)
+        # Phản hồi trực tiếp
+        with st.chat_message("assistant", avatar="⚡"):
+            reply = st.write_stream(response)
+        st.session_state.messages.append({"role": "assistant", "content": reply})
 
-    # Lưu phản hồi vào session
-    st.session_state.messages.append({"role": "assistant", "content": response})
+    except Exception as e:
+        st.error(f"Lỗi: {e}")
