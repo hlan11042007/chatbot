@@ -1,110 +1,86 @@
 import streamlit as st
 from openai import OpenAI
-import os
 
-# === CẤU HÌNH TRANG ===
-st.set_page_config(page_title="Chatbot Vật Lý", page_icon="⚡", layout="centered")
-
-# === CSS DARK MODE + ẢNH TRÒN ===
+# 🌙 Giao diện dark mode + banner vật lý
 st.markdown("""
     <style>
-        .stApp {
-            background: linear-gradient(135deg, #0a0f1f, #1a1a40);
-            color: #e0e0e0;
-            font-family: 'Segoe UI', sans-serif;
+        body {
+            background-color: #0f0f0f;
+            color: #f5f5f5;
         }
-        h1 {
-            text-align: center;
-            color: #82b1ff;
+        .banner {
+            width: 100%;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
         }
-        .subtitle {
-            text-align: center;
-            font-size: 18px;
-            color: #90caf9;
-            margin-bottom: 10px;
+        .avatar {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #ffffff55;
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.2);
         }
-        .author {
+        .footer {
             text-align: center;
             font-size: 15px;
             color: #aaa;
-            margin-top: -5px;
-            font-style: italic;
-        }
-        .stChatInput input {
-            border-radius: 10px;
-            border: 1.5px solid #42a5f5;
-            background-color: #121212;
-            color: white;
-        }
-        .stMarkdown {
-            font-size: 16px;
-            line-height: 1.6;
-        }
-        img.banner {
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-            border-radius: 15px;
-            box-shadow: 0 0 15px rgba(66,165,245,0.5);
-            margin-bottom: 20px;
-        }
-        img.avatar {
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-            width: 160px;
-            height: 160px;
-            border-radius: 50%;
-            object-fit: cover;
-            box-shadow: 0 0 15px rgba(66,165,245,0.5);
-            margin-bottom: 10px;
+            margin-top: 30px;
         }
     </style>
 """, unsafe_allow_html=True)
 
-# === ẢNH AVATAR TÁC GIẢ ===
-author_image_path = "hoanglan.jpg"
-if os.path.exists(author_image_path):
-    st.markdown(f'<img src="{author_image_path}" class="avatar">', unsafe_allow_html=True)
-else:
-    st.warning("⚠️ Chưa tìm thấy ảnh 'hoanglan.jpg' trong thư mục dự án.")
+# 🧠 Banner minh hoạ vật lý
+st.image(
+    "https://cdn.pixabay.com/photo/2015/09/09/18/53/physics-932365_1280.jpg",
+    use_column_width=True,
+    caption="Khám phá tri thức Vật Lý cùng AI 🇻🇳",
+)
 
-# === TIÊU ĐỀ & MÔ TẢ ===
-st.title("⚡ Chatbot Vật Lý ⚡")
-st.markdown('<p class="subtitle">Khám phá Vật Lý cùng trí tuệ nhân tạo – học nhanh, hiểu sâu, sáng tạo không giới hạn!</p>', unsafe_allow_html=True)
-st.markdown('<p class="author">Tác giả: <b>Hoàng Lân</b></p>', unsafe_allow_html=True)
+# 🧩 Tiêu đề & mô tả
+st.title("💬 Chatbot Học Tập - Vật Lý & Tuổi Trẻ Việt Nam")
+st.caption("Tác giả: **Hoàng Lân** • Chatbot AI hỗ trợ học tập và khám phá khoa học bằng tiếng Việt 🇻🇳")
 
-# === KẾT NỐI OPENAI ===
+# 🗝️ API key (nếu chạy riêng) hoặc dùng key trong Streamlit Cloud
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
-# === LỊCH SỬ CHAT ===
+# 💬 Lưu hội thoại
 if "messages" not in st.session_state:
-    st.session_state.messages = [
-        {"role": "system", "content": "Bạn là Chatbot nói tiếng Việt, thân thiện và chuyên giải thích Vật Lý dễ hiểu cho học sinh Việt Nam."}
-    ]
+    st.session_state.messages = []
 
-# === HIỂN THỊ LỊCH SỬ ===
-for msg in st.session_state.messages[1:]:
-    with st.chat_message(msg["role"]):
-        st.markdown(msg["content"])
+# Hiển thị tin nhắn cũ
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
 
-# === Ô NHẬP CHAT ===
-if prompt := st.chat_input("Nhập câu hỏi hoặc chủ đề bạn muốn hỏi..."):
+# Ô nhập chat
+if prompt := st.chat_input("Nhập tin nhắn của bạn..."):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    try:
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=st.session_state.messages,
-            stream=True,
-        )
+    # Gọi OpenAI để sinh phản hồi
+    stream = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": m["role"], "content": m["content"]}
+            for m in st.session_state.messages
+        ],
+        stream=True,
+    )
 
-        # Hiển thị phản hồi
-        with st.chat_message("assistant"):
-            reply = st.write_stream(response)
-        st.session_state.messages.append({"role": "assistant", "content": reply})
+    with st.chat_message("assistant"):
+        response = st.write_stream(stream)
 
-    except Exception as e:
-        st.error(f"Lỗi: {e}")
+    st.session_state.messages.append({"role": "assistant", "content": response})
+
+# 📷 Ảnh tác giả (hiển thị góc phải)
+author_image_url = "https://drive.google.com/uc?export=view&id=1vCLYkeFL1ZgcJwvD_FYw2BeQbP7Wuf69"
+st.markdown(f'<img src="{author_image_url}" class="avatar">', unsafe_allow_html=True)
+
+# 🧾 Footer
+st.markdown('<div class="footer">© 2025 Hoàng Lân • Chatbot học tập Vật Lý</div>', unsafe_allow_html=True)
