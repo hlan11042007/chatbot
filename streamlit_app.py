@@ -1,54 +1,67 @@
 import streamlit as st
 from openai import OpenAI
 
-# === GIAO DIỆN ===
+# === CẤU HÌNH GIAO DIỆN ===
 st.set_page_config(page_title="Chatbot Vật Lý", page_icon="⚡", layout="centered")
 
-# CSS tùy chỉnh (phong cách trẻ trung, năng động)
+# CSS phong cách năng động, thân thiện với học sinh
 st.markdown("""
     <style>
-        body {
-            background: linear-gradient(135deg, #e0f7fa, #fffde7);
-            color: #222;
-        }
         .stApp {
-            background: linear-gradient(135deg, #c8e6c9, #fff9c4);
+            background: linear-gradient(135deg, #d1f4ff, #fff9c4);
+            font-family: 'Segoe UI', sans-serif;
         }
         h1 {
             text-align: center;
-            color: #2e7d32;
-            font-family: 'Segoe UI', sans-serif;
+            color: #0d47a1;
+        }
+        .subtitle {
+            text-align: center;
+            font-size: 18px;
+            color: #1565c0;
+            margin-bottom: 20px;
+        }
+        .author {
+            text-align: center;
+            font-size: 15px;
+            color: #555;
+            margin-top: 10px;
+            font-style: italic;
         }
         .stChatInput input {
-            border-radius: 12px;
-            border: 1.5px solid #4caf50;
+            border-radius: 10px;
+            border: 1.5px solid #42a5f5;
+        }
+        .stMarkdown {
+            font-size: 16px;
+            line-height: 1.6;
         }
     </style>
 """, unsafe_allow_html=True)
 
-# === TIÊU ĐỀ & GIỚI THIỆU ===
-st.title("⚡ Chatbot Học Tập ⚡")
-st.caption("Khám phá thế giới Vật Lý cùng trí tuệ nhân tạo – học hỏi, sáng tạo và phát triển!")
+# === TIÊU ĐỀ & MÔ TẢ ===
+st.title("⚡ Chatbot Vật Lý ⚡")
+st.markdown('<p class="subtitle">Khám phá Vật Lý dễ hiểu cùng trí tuệ nhân tạo – học nhanh, hiểu sâu, sáng tạo không giới hạn!</p>', unsafe_allow_html=True)
+st.markdown('<p class="author">Tác giả: <b>Hoàng Lân</b></p>', unsafe_allow_html=True)
 
 # === KẾT NỐI OPENAI ===
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
-# === LƯU LỊCH SỬ ===
+# === LƯU LỊCH SỬ HỘI THOẠI ===
 if "messages" not in st.session_state:
     st.session_state.messages = [
-        {"role": "system", "content": "Bạn là Chatbot vui vẻ, nói tiếng Việt, chuyên giúp học sinh Việt Nam hiểu Vật Lý dễ hơn. Hãy truyền cảm hứng học tập!"}
+        {"role": "system", "content": "Bạn là Chatbot nói tiếng Việt, thân thiện và chuyên giải thích Vật Lý dễ hiểu cho học sinh Việt Nam."}
     ]
 
-# === HIỂN THỊ TIN NHẮN CŨ ===
+# === HIỂN THỊ TIN NHẮN TRƯỚC ===
 for msg in st.session_state.messages[1:]:
-    avatar = "👩‍🎓" if msg["role"] == "user" else "⚡"
-    with st.chat_message(msg["role"], avatar=avatar):
+    with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
 
-# === NHẬP CÂU HỎI ===
-if prompt := st.chat_input("Nhập câu hỏi Vật Lý của bạn..."):
+# === Ô NHẬP TIN NHẮN ===
+if prompt := st.chat_input("Nhập câu hỏi hoặc chủ đề Vật Lý bạn muốn học..."):
     st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user", avatar="👩‍🎓"):
+    with st.chat_message("user"):
         st.markdown(prompt)
 
     try:
@@ -58,8 +71,8 @@ if prompt := st.chat_input("Nhập câu hỏi Vật Lý của bạn..."):
             stream=True,
         )
 
-        # Phản hồi trực tiếp
-        with st.chat_message("assistant", avatar="⚡"):
+        # Ghi phản hồi ra giao diện
+        with st.chat_message("assistant"):
             reply = st.write_stream(response)
         st.session_state.messages.append({"role": "assistant", "content": reply})
 
